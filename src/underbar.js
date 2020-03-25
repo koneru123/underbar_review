@@ -182,6 +182,15 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    if (accumulator === undefined) {
+      accumulator = collection[0]
+      collection = collection.slice(1)
+    }
+
+    _.each(collection, function(item,index) {
+      accumulator = iterator(accumulator,item)
+    })
+    return accumulator
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -198,14 +207,49 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
+  _.every = function (collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator) {
+      for (var i = 0; i < collection.length; i++) {
+        var element = iterator(collection[i]);
+
+        if (element === false || element === undefined || element === 0) {
+          return false;
+        }
+      }
+    } else {
+      for (var i = 0; i < collection.length; i++){
+        var element = collection[i]
+        if (element === false || element === undefined || element === 0) {
+          return false;
+        }
+      }
+    }
+    return true
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator) {
+      for (var i = 0; i < collection.length; i++) {
+        var element = iterator(collection[i]);
+
+        if (element === true || element === 1 || element === {} || (typeof  element === "string" && element.length > 0)) {
+          return true;
+        }
+      }
+    } else {
+      for (var i = 0; i < collection.length; i++){
+        var element = collection[i]
+        if (element === true|| element === 1 || element === {}) {
+          return true;
+        }
+      }
+    }
+    return false
+
   };
 
 
@@ -228,6 +272,16 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var numArgs = arguments.length;
+    for(var i = 0; i < numArgs; i++) {
+      var currentArgument = arguments[i];
+      var currentKeys = Object.keys(currentArgument);
+      for(var j = 0; j < currentKeys.length; j++) {
+        var individualKey = currentKeys[j];
+        obj[individualKey] = currentArgument[individualKey];
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
